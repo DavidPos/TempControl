@@ -1,6 +1,7 @@
 package com.sailoftlabs.tempcontrol;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import io.particle.android.sdk.devicesetup.ParticleDeviceSetupLibrary;
+import io.particle.android.sdk.utils.ui.Toaster;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -44,6 +46,23 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        ParticleDeviceSetupLibrary.DeviceSetupCompleteReceiver receiver = new ParticleDeviceSetupLibrary.DeviceSetupCompleteReceiver() {
+
+
+            @Override
+            public void onSetupSuccess(@NonNull String configuredDeviceId) {
+                Toaster.s(MainActivity.this, "Hooray, you set up device " + configuredDeviceId);
+            }
+
+            @Override
+            public void onSetupFailure() {
+                Toaster.s(MainActivity.this, "Sorry, device setup failed.  (sad trombone)");
+            }
+        };
+        receiver.register(MainActivity.this);
+        ParticleDeviceSetupLibrary.startDeviceSetup(MainActivity.this);
+
+        receiver.unregister(MainActivity.this);
 
 
     }
