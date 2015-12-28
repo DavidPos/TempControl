@@ -10,12 +10,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import io.particle.android.sdk.devicesetup.ParticleDeviceSetupLibrary;
-import io.particle.android.sdk.utils.ui.Toaster;
+import java.io.IOException;
+
+import io.particle.android.sdk.cloud.ParticleCloud;
+import io.particle.android.sdk.cloud.ParticleCloudException;
+import io.particle.android.sdk.cloud.ParticleCloudSDK;
+import io.particle.android.sdk.utils.Async;
+import io.particle.android.sdk.utils.Toaster;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -26,7 +32,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        ParticleDeviceSetupLibrary.init(this.getApplicationContext(), MainActivity.class);
+        //ParticleDeviceSetupLibrary.init(this.getApplicationContext(), MainActivity.class);
+        ParticleCloudSDK.init(MainActivity.this);
         
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -46,7 +53,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        ParticleDeviceSetupLibrary.DeviceSetupCompleteReceiver receiver = new ParticleDeviceSetupLibrary.DeviceSetupCompleteReceiver() {
+        /*ParticleDeviceSetupLibrary.DeviceSetupCompleteReceiver receiver = new ParticleDeviceSetupLibrary.DeviceSetupCompleteReceiver() {
 
 
             @Override
@@ -63,7 +70,29 @@ public class MainActivity extends AppCompatActivity
         ParticleDeviceSetupLibrary.startDeviceSetup(MainActivity.this);
 
         receiver.unregister(MainActivity.this);
+*/
+        ParticleCloud cloud = ParticleCloudSDK.getCloud();
+        Async.executeAsync(cloud, new Async.ApiWork<ParticleCloud, Void>() {
+            @Override
+            public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+                String email = "";
+                String password = "";
+                particleCloud.logIn(email, password);
+                return null;
+            }
 
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toaster.l(MainActivity.this, "Logged in");
+                // start new activity...
+            }
+
+            @Override
+            public void onFailure(ParticleCloudException e) {
+                Log.e("SOME_TAG", e +"");
+                Toaster.l(MainActivity.this, "Wrong credentials or no internet connectivity, please try again");
+            }
+        });
 
     }
 
