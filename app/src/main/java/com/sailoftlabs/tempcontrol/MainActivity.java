@@ -53,28 +53,13 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        /*ParticleDeviceSetupLibrary.DeviceSetupCompleteReceiver receiver = new ParticleDeviceSetupLibrary.DeviceSetupCompleteReceiver() {
 
-
-            @Override
-            public void onSetupSuccess(@NonNull String configuredDeviceId) {
-                Toaster.s(MainActivity.this, "Hooray, you set up device " + configuredDeviceId);
-            }
-
-            @Override
-            public void onSetupFailure() {
-                Toaster.s(MainActivity.this, "Sorry, device setup failed.  (sad trombone)");
-            }
-        };
-        receiver.register(MainActivity.this);
-        ParticleDeviceSetupLibrary.startDeviceSetup(MainActivity.this);
-
-        receiver.unregister(MainActivity.this);
-*/
         ParticleCloud cloud = ParticleCloudSDK.getCloud();
+
         Async.executeAsync(cloud, new Async.ApiWork<ParticleCloud, Void>() {
             @Override
             public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+                //Intent intent = new Intent(MainActivity.this, io.particle.android.sdk.accountsetup.LoginActivity.class);
                 String email = "";
                 String password = "";
                 particleCloud.logIn(email, password);
