@@ -1,7 +1,7 @@
 package com.sailoftlabs.tempcontrol;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -10,17 +10,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.io.IOException;
-
-import io.particle.android.sdk.cloud.ParticleCloud;
-import io.particle.android.sdk.cloud.ParticleCloudException;
 import io.particle.android.sdk.cloud.ParticleCloudSDK;
-import io.particle.android.sdk.utils.Async;
 import io.particle.android.sdk.utils.Toaster;
 
 public class MainActivity extends AppCompatActivity
@@ -54,31 +48,22 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        ParticleCloud cloud = ParticleCloudSDK.getCloud();
+        if (getIntent() == null){
+            navigateToLogin();
+        }
+        else{
+            Intent intent = getIntent();
+            String device = intent.getStringExtra("device");
+            Toaster.l(MainActivity.this, device);
+        }
 
-        Async.executeAsync(cloud, new Async.ApiWork<ParticleCloud, Void>() {
-            @Override
-            public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
-                //Intent intent = new Intent(MainActivity.this, io.particle.android.sdk.accountsetup.LoginActivity.class);
-                String email = "";
-                String password = "";
-                particleCloud.logIn(email, password);
-                return null;
-            }
+    }
 
-            @Override
-            public void onSuccess(Void aVoid) {
-                Toaster.l(MainActivity.this, "Logged in");
-                // start new activity...
-            }
-
-            @Override
-            public void onFailure(ParticleCloudException e) {
-                Log.e("SOME_TAG", e +"");
-                Toaster.l(MainActivity.this, "Wrong credentials or no internet connectivity, please try again");
-            }
-        });
-
+    private void navigateToLogin() {
+        Intent intent = new Intent(this, Login.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     @Override

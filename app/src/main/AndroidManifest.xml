@@ -19,8 +19,10 @@
             </intent-filter>
         </activity>
 
-        <!-- All of the following are from the device setup lib, and must be present in your app's
-manifest or you will not go to space today. -->
+        <!--
+All of the following are from the device setup lib, and must be present in your app's
+manifest or you will not go to space today.
+        -->
         <activity
             android:name="io.particle.android.sdk.devicesetup.ui.DiscoverDeviceActivity"
             android:label="@string/title_activity_discover_device"
@@ -85,8 +87,15 @@ manifest or you will not go to space today. -->
             android:screenOrientation="portrait"
             android:theme="@style/ParticleSetupTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize|stateVisible" />
-
-
+        <activity
+            android:name=".Login"
+            android:label="@string/title_activity_login"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.sailoftlabs.tempcontrol.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
