@@ -47,15 +47,15 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigateToLogin();
+        Intent intent = getIntent();
 
-        if (getIntent() == null){
-            navigateToLogin();
-        }
-        else{
-            Intent intent = getIntent();
+
+
+
             String device = intent.getStringExtra("device");
             Toaster.l(MainActivity.this, device);
-        }
+
 
     }
 
