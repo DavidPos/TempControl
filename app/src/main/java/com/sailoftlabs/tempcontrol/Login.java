@@ -27,7 +27,9 @@ public class Login extends AppCompatActivity {
     protected EditText mUsername;
     protected EditText mPassword;
     protected Button mLoginButton;
-    private List<String> devices = new ArrayList<>();
+    private ArrayList<String> devices = new ArrayList<>();
+    private ParticleDevice mDevice;
+    private CharSequence[] items;
 
 
     @Override
@@ -73,20 +75,26 @@ public class Login extends AppCompatActivity {
 
                     Async.executeAsync(cloud, new Async.ApiWork<ParticleCloud, Void>() {
 
-                        private ParticleDevice mDevice;
+
                         @Override
-                        public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+                        public Void callApi(@NonNull final ParticleCloud particleCloud) throws ParticleCloudException, IOException {
 
 
                             particleCloud.logIn(username, password);
                             particleCloud.getDevices();
-                            List<ParticleDevice> allDevices = particleCloud.getDevices();
+                            final List<ParticleDevice> allDevices = particleCloud.getDevices();
                             for (ParticleDevice device : allDevices){
                                 devices.add(device.getID());
+
                             }
                             if (!devices.isEmpty()){
+
                                 mDevice = particleCloud.getDevice(devices.get(0));
-                                Toaster.l(Login.this, "Device found");
+                                
+
+
+
+                                Toaster.l(Login.this, "Device found" + " " + mDevice.getName());
 
                             }
                             else {
