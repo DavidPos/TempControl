@@ -1,6 +1,7 @@
 package com.sailoftlabs.tempcontrol;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +30,8 @@ public class Login extends AppCompatActivity {
     protected Button mLoginButton;
     private ArrayList<String> devices = new ArrayList<>();
     private ParticleDevice mDevice;
-    private CharSequence[] items;
+
+    private String accessToken;
 
 
     @Override
@@ -52,6 +54,7 @@ public class Login extends AppCompatActivity {
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mLoginButton.setEnabled(false);
                 final String username = mUsername.getText().toString();
                 final String password = mPassword.getText().toString();
 
@@ -73,6 +76,7 @@ public class Login extends AppCompatActivity {
                     setProgressBarVisibility(true);
                     final ParticleCloud cloud = ParticleCloudSDK.getCloud();
 
+
                     Async.executeAsync(cloud, new Async.ApiWork<ParticleCloud, Void>() {
 
 
@@ -81,6 +85,8 @@ public class Login extends AppCompatActivity {
 
 
                             particleCloud.logIn(username, password);
+
+
                             particleCloud.getDevices();
                             final List<ParticleDevice> allDevices = particleCloud.getDevices();
                             for (ParticleDevice device : allDevices){
@@ -90,7 +96,7 @@ public class Login extends AppCompatActivity {
                             if (!devices.isEmpty()){
 
                                 mDevice = particleCloud.getDevice(devices.get(0));
-                                
+
 
 
 
@@ -114,12 +120,13 @@ public class Login extends AppCompatActivity {
 
 
                             // start new activity...
-                           /* Intent intent = new Intent(Login.this, MainActivity.class);
+                            Intent intent = new Intent(Login.this, MainActivity.class);
 
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.putExtra("device", mDevice.getID());
 
-                            startActivity(intent);*/
+                            startActivity(intent);
                         }
 
                         @Override

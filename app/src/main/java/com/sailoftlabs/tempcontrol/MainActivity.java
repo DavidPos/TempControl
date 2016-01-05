@@ -10,15 +10,23 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.io.IOException;
+
+import io.particle.android.sdk.cloud.ParticleCloud;
+import io.particle.android.sdk.cloud.ParticleCloudException;
 import io.particle.android.sdk.cloud.ParticleCloudSDK;
+import io.particle.android.sdk.cloud.ParticleDevice;
+import io.particle.android.sdk.utils.Async;
 import io.particle.android.sdk.utils.Toaster;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private ParticleDevice myDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +35,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //ParticleDeviceSetupLibrary.init(this.getApplicationContext(), MainActivity.class);
-        ParticleCloudSDK.init(MainActivity.this);
+        //ParticleCloudSDK.init(MainActivity.this);
         
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -47,24 +55,33 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        navigateToLogin();
+
         Intent intent = getIntent();
+        final String device = intent.getStringExtra("device");
 
+        ParticleCloud pCloud = ParticleCloudSDK.getCloud();
 
+        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, ParticleDevice>() {
 
+            public ParticleDevice callApi(ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+                return particleCloud.getDevice(device);
+            }
 
-            String device = intent.getStringExtra("device");
-            Toaster.l(MainActivity.this, device);
+            @Override
+            public void onSuccess(ParticleDevice device) {
+                myDevice = device;
+                Toaster.l(MainActivity.this, myDevice.getName());
+            }
 
+            @Override
+            public void onFailure(ParticleCloudException e) {
+                Log.e("ERROR", e +"");
+            }
+        });
 
     }
 
-    private void navigateToLogin() {
-        Intent intent = new Intent(this, Login.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-    }
+
 
     @Override
     public void onBackPressed() {
