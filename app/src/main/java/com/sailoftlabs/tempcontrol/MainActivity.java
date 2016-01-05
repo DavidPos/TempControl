@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity
             public void onSuccess(ParticleDevice device) {
                 myDevice = device;
                 Toaster.l(MainActivity.this, myDevice.getName());
+
             }
 
             @Override
@@ -118,6 +119,7 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        //TODO:Add Login id for going to login activity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 

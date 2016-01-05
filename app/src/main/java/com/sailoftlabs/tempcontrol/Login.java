@@ -85,7 +85,7 @@ public class Login extends AppCompatActivity {
 
 
                             particleCloud.logIn(username, password);
-
+                            //TODO: Add list of devices to select from once logged in
 
                             particleCloud.getDevices();
                             final List<ParticleDevice> allDevices = particleCloud.getDevices();
@@ -96,36 +96,23 @@ public class Login extends AppCompatActivity {
                             if (!devices.isEmpty()){
 
                                 mDevice = particleCloud.getDevice(devices.get(0));
-
-
-
-
                                 Toaster.l(Login.this, "Device found" + " " + mDevice.getName());
-
                             }
                             else {
                                 Toaster.l(Login.this,"No Devices");
                             }
-
-
                             return null;
                         }
 
                         @Override
                         public void onSuccess(Void aVoid) {
                             Toaster.l(Login.this, "Logged in");
-
-
-
-
-
                             // start new activity...
                             Intent intent = new Intent(Login.this, MainActivity.class);
 
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             intent.putExtra("device", mDevice.getID());
-
                             startActivity(intent);
                         }
 
