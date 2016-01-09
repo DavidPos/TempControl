@@ -14,9 +14,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import java.io.IOException;
-import java.util.Map;
 
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
@@ -28,12 +28,14 @@ import io.particle.android.sdk.utils.Toaster;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private ParticleDevice myDevice;
+    private TextView tempOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        tempOut = (TextView) findViewById(R.id.tempText);
         setSupportActionBar(toolbar);
         //ParticleDeviceSetupLibrary.init(this.getApplicationContext(), MainActivity.class);
         //ParticleCloudSDK.init(MainActivity.this);
@@ -73,8 +75,18 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(ParticleDevice device) {
                 myDevice = device;
-                final Map variables =  myDevice.getVariables();
-                
+                try {
+                    double temp = myDevice.getDoubleVariable("temperature");
+                    tempOut.setText("Temp: " + temp);
+
+                } catch (ParticleCloudException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ParticleDevice.VariableDoesNotExistException e) {
+                    e.printStackTrace();
+                }
+
                 Toaster.l(MainActivity.this, myDevice.getName());
 
 

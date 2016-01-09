@@ -19,5 +19,6 @@
         android:text="Temp --"
         android:textSize="35sp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp" />
+        android:layout_marginTop="100dp"
+        android:id="@+id/tempText" />
 </RelativeLayout>
