@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import java.io.IOException;
+import java.util.Map;
 
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
@@ -64,13 +65,18 @@ public class MainActivity extends AppCompatActivity
         Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, ParticleDevice>() {
 
             public ParticleDevice callApi(ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+
                 return particleCloud.getDevice(device);
+
             }
 
             @Override
             public void onSuccess(ParticleDevice device) {
                 myDevice = device;
+                final Map variables =  myDevice.getVariables();
+                
                 Toaster.l(MainActivity.this, myDevice.getName());
+
 
             }
 
