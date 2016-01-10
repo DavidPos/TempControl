@@ -10,7 +10,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +28,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private ParticleDevice myDevice;
     private TextView tempOut;
+    private String device;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +45,9 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Temp refreshed", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                getTemp();
             }
         });
 
@@ -60,46 +61,45 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         Intent intent = getIntent();
-        final String device = intent.getStringExtra("device");
+        device = intent.getStringExtra("device");
+        getTemp();
 
+
+
+
+    }
+
+    private void getTemp() {
         ParticleCloud pCloud = ParticleCloudSDK.getCloud();
-
-        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, ParticleDevice>() {
-
-            public ParticleDevice callApi(ParticleCloud particleCloud) throws ParticleCloudException, IOException {
-
-                return particleCloud.getDevice(device);
-
+        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Object>() {
+            @Override
+            public Object callApi(ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
+                ParticleDevice myDevice = ParticleCloud.getDevice(device);
+                Object variable;
+                try {
+                    variable = myDevice.getVariable("temperature");
+                } catch (ParticleDevice.VariableDoesNotExistException e) {
+                    Toaster.l(MainActivity.this, e.getMessage());
+                    variable = -1;
+                }
+                return variable;
             }
 
             @Override
-            public void onSuccess(ParticleDevice device) {
-                myDevice = device;
-                try {
-                    double temp = myDevice.getDoubleVariable("temperature");
-                    tempOut.setText("Temp: " + temp);
+            public void onSuccess(Object i) { // this goes on the main thread
+                final double tempCon = Double.parseDouble(i.toString());
+                
+                String result = String.format("%.2f", tempCon);
 
-                } catch (ParticleCloudException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ParticleDevice.VariableDoesNotExistException e) {
-                    e.printStackTrace();
-                }
-
-                Toaster.l(MainActivity.this, myDevice.getName());
-
-
+                tempOut.setText("Temp: " + result);
             }
 
             @Override
             public void onFailure(ParticleCloudException e) {
-                Log.e("ERROR", e +"");
+                e.printStackTrace();
             }
         });
-
     }
-
 
 
     @Override
@@ -159,4 +159,5 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 }

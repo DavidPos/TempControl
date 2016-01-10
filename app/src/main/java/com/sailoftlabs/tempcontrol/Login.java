@@ -95,7 +95,7 @@ public class Login extends AppCompatActivity {
                             }
                             if (!devices.isEmpty()){
 
-                                mDevice = particleCloud.getDevice(devices.get(0));
+                                mDevice = particleCloud.getDevice(devices.get(1));
                                 Toaster.l(Login.this, "Device found" + " " + mDevice.getName());
                             }
                             else {
@@ -125,6 +125,7 @@ public class Login extends AppCompatActivity {
                                     .setPositiveButton(android.R.string.ok, null);
                             AlertDialog dialog = builder.create();
                             dialog.show();
+                            mLoginButton.setEnabled(true);
                         }
                     });
 
