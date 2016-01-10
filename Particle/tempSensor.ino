@@ -24,7 +24,7 @@ void setup()
 
 void loop()
 {
-  int analogValue = analogRead(A7);
+  int analogValue = analogRead(A5);
   double voltage = 3.3 * ((double)analogValue / 4095.0);
 
   // http://www.analog.com/static/imported-files/data_sheets/TMP35_36_37.pdf

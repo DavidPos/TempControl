@@ -88,10 +88,10 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(Object i) { // this goes on the main thread
                 final double tempCon = Double.parseDouble(i.toString());
-                
+
                 String result = String.format("%.2f", tempCon);
 
-                tempOut.setText("Temp: " + result);
+                tempOut.setText("Temp: " + result + "\u2103");
             }
 
             @Override
