@@ -21,6 +21,7 @@ import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
 import io.particle.android.sdk.cloud.ParticleCloudSDK;
 import io.particle.android.sdk.cloud.ParticleDevice;
+import io.particle.android.sdk.cloud.ParticleEvent;
 import io.particle.android.sdk.utils.Async;
 import io.particle.android.sdk.utils.Toaster;
 
@@ -63,6 +64,8 @@ public class MainActivity extends AppCompatActivity
         Intent intent = getIntent();
         device = intent.getStringExtra("device");
         getTemp();
+        ParticleEvent event;
+
 
 
 
@@ -91,7 +94,8 @@ public class MainActivity extends AppCompatActivity
 
                 String result = String.format("%.2f", tempCon);
 
-                tempOut.setText("Temp: " + result + "\u2103");
+                tempOut.setText("Temp: " + result + " \u2103");
+
             }
 
             @Override
@@ -138,6 +142,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         //TODO:Add Login id for going to login activity
+        //TODO:Add Setting id
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
