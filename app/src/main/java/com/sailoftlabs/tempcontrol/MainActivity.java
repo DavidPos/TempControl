@@ -10,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +23,7 @@ import io.particle.android.sdk.cloud.ParticleCloudException;
 import io.particle.android.sdk.cloud.ParticleCloudSDK;
 import io.particle.android.sdk.cloud.ParticleDevice;
 import io.particle.android.sdk.cloud.ParticleEvent;
+import io.particle.android.sdk.cloud.ParticleEventHandler;
 import io.particle.android.sdk.utils.Async;
 import io.particle.android.sdk.utils.Toaster;
 
@@ -64,10 +66,6 @@ public class MainActivity extends AppCompatActivity
         Intent intent = getIntent();
         device = intent.getStringExtra("device");
         getTemp();
-        ParticleEvent event;
-
-
-
 
 
     }
@@ -77,6 +75,7 @@ public class MainActivity extends AppCompatActivity
         Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Object>() {
             @Override
             public Object callApi(ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
+
                 ParticleDevice myDevice = ParticleCloud.getDevice(device);
                 Object variable;
                 try {
@@ -85,6 +84,24 @@ public class MainActivity extends AppCompatActivity
                     Toaster.l(MainActivity.this, e.getMessage());
                     variable = -1;
                 }
+                long subscriptionId;  // save this for later, for unsubscribing
+                try {
+                    subscriptionId = ParticleCloudSDK.getCloud().subscribeToDeviceEvents(
+                            "temperature",  //event name
+                            device,
+                            new ParticleEventHandler() {
+                                public void onEvent(String eventName, ParticleEvent event) {
+                                    Log.i("some tag", "Received event with payload: " + event.dataPayload);
+                                }
+
+                                public void onEventError(Exception e) {
+                                    Log.e("some tag", "Event error: ", e);
+                                }
+                            });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 return variable;
             }
 
