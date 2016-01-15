@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.particle.android.sdk.cloud.ParticleAccessToken;
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
 import io.particle.android.sdk.cloud.ParticleCloudSDK;
@@ -88,6 +89,11 @@ public class Login extends AppCompatActivity {
                             //TODO: Add list of devices to select from once logged in
 
                             particleCloud.getDevices();
+
+
+
+                            Toaster.l(Login.this, "Access" + particleCloud.getAccessToken());
+
                             final List<ParticleDevice> allDevices = particleCloud.getDevices();
                             for (ParticleDevice device : allDevices){
                                 devices.add(device.getID());

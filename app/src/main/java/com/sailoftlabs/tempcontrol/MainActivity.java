@@ -2,6 +2,7 @@ package com.sailoftlabs.tempcontrol;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity
     private ParticleDevice myDevice;
     private TextView tempOut;
     private String device;
+    private Object tempVar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +65,52 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+
         Intent intent = getIntent();
         device = intent.getStringExtra("device");
-        getTemp();
+        ParticleCloud pCloud = ParticleCloudSDK.getCloud();
+        Toaster.l(MainActivity.this, "Access" + pCloud.getAccessToken());
+
+
+        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Object>() {
+            @Override
+            public Object callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+                ParticleDevice myDevice = particleCloud.getDevice(device);
+
+                long subscriptionId;  // save this for later, for unsubscribing
+                try {
+                    subscriptionId = myDevice.subscribeToEvents(
+                            "temperature",  //event name
+                            new ParticleEventHandler() {
+                                public void onEvent(String eventName, ParticleEvent event) {
+                                    tempVar = event.dataPayload;
+                                    tempOut.setText("Temp: " + tempVar + " \u2103");
+                                    Log.i("Photon Event: ", "Received event with payload: " + event.dataPayload);
+                                }
+
+                                public void onEventError(Exception e) {
+                                    Log.e("some tag", "Event error: ", e);
+                                }
+                            });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return tempVar;
+            }
+
+            @Override
+            public void onSuccess(Object o) {
+               // tempOut.setText("Temp: " + o + " \u2103");
+
+            }
+
+            @Override
+            public void onFailure(ParticleCloudException exception) {
+
+            }
+        });
+
+        //getTemp();
 
 
     }
@@ -84,23 +129,8 @@ public class MainActivity extends AppCompatActivity
                     Toaster.l(MainActivity.this, e.getMessage());
                     variable = -1;
                 }
-                long subscriptionId;  // save this for later, for unsubscribing
-                try {
-                    subscriptionId = ParticleCloudSDK.getCloud().subscribeToDeviceEvents(
-                            "temperature",  //event name
-                            device,
-                            new ParticleEventHandler() {
-                                public void onEvent(String eventName, ParticleEvent event) {
-                                    Log.i("some tag", "Received event with payload: " + event.dataPayload);
-                                }
 
-                                public void onEventError(Exception e) {
-                                    Log.e("some tag", "Event error: ", e);
-                                }
-                            });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
 
                 return variable;
             }
