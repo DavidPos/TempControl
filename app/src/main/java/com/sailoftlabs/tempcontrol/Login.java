@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.particle.android.sdk.cloud.ParticleAccessToken;
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
 import io.particle.android.sdk.cloud.ParticleCloudSDK;
@@ -56,12 +55,11 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mLoginButton.setEnabled(false);
-                final String username = mUsername.getText().toString();
-                final String password = mPassword.getText().toString();
+                final String username = mUsername.getText().toString().trim();
+                final String password = mPassword.getText().toString().trim();
 
 
-                username.trim();
-                password.trim();
+
 
 
                 if (username.isEmpty() || password.isEmpty() ){
@@ -92,7 +90,6 @@ public class Login extends AppCompatActivity {
 
 
 
-                            Toaster.l(Login.this, "Access" + particleCloud.getAccessToken());
 
                             final List<ParticleDevice> allDevices = particleCloud.getDevices();
                             for (ParticleDevice device : allDevices){
