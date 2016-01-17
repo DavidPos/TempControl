@@ -91,7 +91,7 @@ public class EventDelegate {
                             handler.onEvent(sseEventReader.getName(), event);
 
                         } else {
-                            Log.e("Event Delegat: ", "type null or not data: " + type);
+                            Log.e("Event Delegate: ", "type null or not data: " + type);
                         }
                         type = sseEventReader.next();
                     }
