@@ -12,6 +12,7 @@ public class EventDelegate {
     private static class EventApiUris {
 
         private final String EVENTS = "events";
+        private String AUTH_KEY = "?access_token=";
 
         private final Uri allEventsUri;
         private final Uri devicesBaseUri;
@@ -21,6 +22,7 @@ public class EventDelegate {
             allEventsUri = baseUri.buildUpon().path("/v1/" + EVENTS).build();
             devicesBaseUri = baseUri.buildUpon().path("/v1/devices").build();
             myDevicesEventsUri = devicesBaseUri.buildUpon().appendPath(EVENTS).build();
+
         }
 
         Uri buildAllEventsUri(@Nullable String eventNamePrefix) {
@@ -31,7 +33,7 @@ public class EventDelegate {
             }
         }
 
-        Uri buildMyDevicesEventUri(@Nullable String eventNamePrefix) {
+        Uri buildMyDevicesEventUri(@Nullable String eventNamePrefix, String accessToken) {
             if (truthy(eventNamePrefix)) {
                 return myDevicesEventsUri.buildUpon().appendPath(eventNamePrefix).build();
             } else {
@@ -39,10 +41,10 @@ public class EventDelegate {
             }
         }
 
-        Uri buildSingleDeviceEventUri(@Nullable String eventNamePrefix, String deviceId) {
+        Uri buildSingleDeviceEventUri(@Nullable String eventNamePrefix, String deviceId, String accessToken) {
             Uri.Builder builder = devicesBaseUri.buildUpon().appendPath(deviceId);
             if (truthy(eventNamePrefix)) {
-                builder.appendPath(eventNamePrefix);
+                builder.appendPath(eventNamePrefix + AUTH_KEY + accessToken);
             }
             return builder.build();
         }
