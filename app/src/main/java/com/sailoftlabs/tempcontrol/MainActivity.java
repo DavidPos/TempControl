@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.Date;
 
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
@@ -25,6 +26,7 @@ import io.particle.android.sdk.cloud.ParticleCloudSDK;
 import io.particle.android.sdk.cloud.ParticleDevice;
 import io.particle.android.sdk.cloud.ParticleEvent;
 import io.particle.android.sdk.cloud.ParticleEventHandler;
+import io.particle.android.sdk.persistance.SensitiveDataStorage;
 import io.particle.android.sdk.utils.Async;
 import io.particle.android.sdk.utils.Toaster;
 
@@ -65,6 +67,14 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        SensitiveDataStorage sensitiveDataStorage = new SensitiveDataStorage(this);
+        Date tokenDate = sensitiveDataStorage.getTokenExpirationDate();
+        Date currentDate = new Date();
+        if (currentDate.after(tokenDate)){
+            Toaster.l(MainActivity.this,"Token date is: " + tokenDate + " " + " Current Date: " + currentDate);
+        }else{
+            Toaster.l(MainActivity.this, "Token is not expired " + currentDate +" " + "Token Date is: " +tokenDate);
+        }
 
 
         Intent intent = getIntent();

@@ -26,7 +26,7 @@ import static io.particle.android.sdk.utils.Py.truthy;
  * Created by davidpos on 1/16/16.
  */
 public class EventDelegate {
-    
+
 
     private static class EventApiUris {
 
