@@ -35,6 +35,7 @@
     <string name="menu_send_label">Send</string>
     <string name="error_select_file">There was an error with the file selected. Please select a different file.</string>
     <string name="error_select_title">We\'re sorry!</string>
+    <string name="device_select_error">Sorry unable to find your device</string>
 
     <string name="error_sending_message">There was an error sending your message. Please try again</string>
     <string name="title_activity_view_image">Temp Control</string>

@@ -1,5 +1,6 @@
 package com.sailoftlabs.tempcontrol;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,8 +19,11 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import io.particle.android.sdk.accountsetup.LoginActivity;
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
 import io.particle.android.sdk.cloud.ParticleCloudSDK;
@@ -37,6 +41,7 @@ public class MainActivity extends AppCompatActivity
     private String device;
     private Object tempVar;
     private  long subscriptionId;
+    private ArrayList<String> devices = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,16 +76,25 @@ public class MainActivity extends AppCompatActivity
         Date tokenDate = sensitiveDataStorage.getTokenExpirationDate();
         Date currentDate = new Date();
         if (currentDate.after(tokenDate)){
+            Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(loginIntent);
             Toaster.l(MainActivity.this,"Token date is: " + tokenDate + " " + " Current Date: " + currentDate);
         }else{
             Toaster.l(MainActivity.this, "Token is not expired " + currentDate +" " + "Token Date is: " +tokenDate);
+
         }
 
 
         Intent intent = getIntent();
-        device = intent.getStringExtra("device");
-        ParticleCloud pCloud = ParticleCloudSDK.getCloud();
+        if (intent == null){
+            getDevice();
+        }else{
+            device = intent.getStringExtra("device");
 
+        }
+
+        ParticleCloud pCloud = ParticleCloudSDK.getCloud();
+        
 
 
 
@@ -137,6 +151,56 @@ public class MainActivity extends AppCompatActivity
         } catch (ParticleCloudException e) {
             e.printStackTrace();
         }
+    }
+
+    private void getDevice(){
+
+        final ParticleCloud cloud = ParticleCloudSDK.getCloud();
+
+
+        Async.executeAsync(cloud, new Async.ApiWork<ParticleCloud, Void>() {
+
+
+            @Override
+            public Void callApi(@NonNull final ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+                //TODO: Add list of devices to select from once logged in
+
+                final List<ParticleDevice> allDevices = particleCloud.getDevices();
+                for (ParticleDevice device : allDevices){
+                    devices.add(device.getID());
+
+                }
+                if (!devices.isEmpty()){
+
+                    myDevice = particleCloud.getDevice(devices.get(1));
+                    Toaster.l(MainActivity.this, "Device found" + " " + myDevice.getName());
+                }
+                else {
+                    Toaster.l(MainActivity.this,"No Devices");
+                }
+                return null;
+            }
+
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toaster.l(MainActivity.this, "Success");
+
+            }
+
+            @Override
+            public void onFailure(ParticleCloudException e) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage(R.string.device_select_error)
+                        .setTitle(R.string.login_error_title)
+                        .setPositiveButton(android.R.string.ok, null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+            }
+        });
+
+
     }
 
     private void getTemp() {
