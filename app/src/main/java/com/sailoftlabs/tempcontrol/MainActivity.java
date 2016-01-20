@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
         tempOut = (TextView) findViewById(R.id.tempText);
         setSupportActionBar(toolbar);
         //ParticleDeviceSetupLibrary.init(this.getApplicationContext(), MainActivity.class);
-        //ParticleCloudSDK.init(MainActivity.this);
+        ParticleCloudSDK.init(MainActivity.this);
         
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
