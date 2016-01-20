@@ -81,16 +81,14 @@ public class MainActivity extends AppCompatActivity
             Toaster.l(MainActivity.this,"Token date is: " + tokenDate + " " + " Current Date: " + currentDate);
         }else{
             Toaster.l(MainActivity.this, "Token is not expired " + currentDate +" " + "Token Date is: " +tokenDate);
-
         }
 
 
         Intent intent = getIntent();
-        if (intent == null){
+        if (intent.getStringExtra("device") == null){
             getDevice();
         }else{
             device = intent.getStringExtra("device");
-
         }
 
         ParticleCloud pCloud = ParticleCloudSDK.getCloud();
@@ -146,11 +144,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        try {
+        /*try {
             myDevice.unsubscribeFromEvents(subscriptionId);
         } catch (ParticleCloudException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void getDevice(){
