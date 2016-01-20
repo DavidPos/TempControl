@@ -97,13 +97,26 @@ public class MainActivity extends AppCompatActivity
 
 
 
-        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Object>() {
+        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
             @Override
-            public Object callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
-                ParticleDevice myDevice = particleCloud.getDevice(device);
+            public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+                long subscriptionId = particleCloud.subscribeToDeviceEvents("temperature",//event name
+                        myDevice.getID(), //device
+                        new ParticleEventHandler() {
+                            public void onEvent(String eventName, ParticleEvent event) {
+                                tempVar = event.dataPayload;
+                                tempOut.setText("Temp: " + event.dataPayload + " \u2103");
+                                Log.i("Photon Event: ", "Received event with payload: " + event.dataPayload);
+                            }
+
+                            public void onEventError(Exception e) {
+                                Log.e("some tag", "Event error: ", e);
+                            }
+                        });
 
 
-                try {
+               /* try {
+
 
                     myDevice.subscribeToEvents(
                             "temperature",  //event name
@@ -122,10 +135,12 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
                 return tempVar;
-            }
+            }*/
 
+                return null;
+            }
             @Override
-            public void onSuccess(Object o) {
+            public void onSuccess(Void aVoid) {
                //tempOut.setText("Temp: " + o + " \u2103");
 
             }
@@ -136,7 +151,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        //getTemp();
+
 
 
     }
