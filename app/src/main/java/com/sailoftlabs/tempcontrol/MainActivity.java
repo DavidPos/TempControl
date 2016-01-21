@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity
     private Object tempVar;
     private  long subscriptionId;
     private ArrayList<String> devices = new ArrayList<>();
+    ParticleCloud pCloud;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,15 +90,14 @@ public class MainActivity extends AppCompatActivity
             getDevice();
         }else{
             device = intent.getStringExtra("device");
+
         }
 
-        ParticleCloud pCloud = ParticleCloudSDK.getCloud();
-        
+        pCloud = ParticleCloudSDK.getCloud();
 
 
 
-
-        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
+        /*Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
             @Override
             public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
                 long subscriptionId = particleCloud.subscribeToDeviceEvents("temperature",//event name
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity
                                 Log.e("some tag", "Event error: ", e);
                             }
                         });
-
+*/
 
                /* try {
 
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity
                 }
                 return tempVar;
             }*/
-
+/*
                 return null;
             }
             @Override
@@ -148,8 +148,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(ParticleCloudException exception) {
 
-            }
-        });
+            }*/
+      //  });
 
 
 
@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(Void aVoid) {
                 Toaster.l(MainActivity.this, "Success");
-
+                subscribeEvents();
             }
 
             @Override
@@ -249,6 +249,38 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(ParticleCloudException e) {
                 e.printStackTrace();
+            }
+        });
+    }
+
+    private void subscribeEvents(){
+        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
+            @Override
+            public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+                long subscriptionId = particleCloud.subscribeToDeviceEvents("temperature",//event name
+                        myDevice.getID(), //device
+                        new ParticleEventHandler() {
+                            public void onEvent(String eventName, ParticleEvent event) {
+                                tempVar = event.dataPayload;
+                                tempOut.setText("Temp: " + event.dataPayload + " \u2103");
+                                Log.i("Photon Event: ", "Received event with payload: " + event.dataPayload);
+                            }
+
+                            public void onEventError(Exception e) {
+                                Log.e("some tag", "Event error: ", e);
+                            }
+                        });
+                return null;
+            }
+
+            @Override
+            public void onSuccess(Void aVoid) {
+
+            }
+
+            @Override
+            public void onFailure(ParticleCloudException exception) {
+
             }
         });
     }
