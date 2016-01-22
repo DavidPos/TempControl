@@ -3,8 +3,7 @@ package com.sailoftlabs.tempcontrol.model;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-import android.util.Log;
-import android.util.LongSparseArray;
+import android.support.v4.util.LongSparseArray;
 
 import com.google.gson.Gson;
 
@@ -49,7 +48,7 @@ public class EventDelegate {
     private final LongSparseArray<EventReader> eventReaders = new LongSparseArray<>();
 
     EventDelegate(ApiDefs.CloudApi cloudApi, Uri baseApiUri, Gson gson, ExecutorService executor,
-                   ParticleCloud cloud) {
+                   ParticleAltCloud cloud) {
         this.cloudApi = cloudApi;
         this.gson = gson;
         this.executor = executor;
@@ -195,70 +194,8 @@ public class EventDelegate {
         private final Uri devicesBaseUri;
         private final Uri myDevicesEventsUri;
 
-        private static class EventReader {
-
-            final ParticleEventHandler handler;
-            final SseEventSource sseEventSource;
-            final ExecutorService executor;
-            final Gson gson;
-
-            volatile Future<?> future;
-
-            private EventReader(ParticleEventHandler handler, ExecutorService executor, Gson gson,
-                                Uri uri, SseEventSourceFactory factory) {
-                this.handler = handler;
-                this.executor = executor;
-                this.gson = gson;
-                try {
-                    sseEventSource = factory.createEventSource(URI.create(uri.toString()));
-                } catch (URISyntaxException e) {
-                    // I don't like throwing exceptions in constructors, but this URI shouldn't be in
-                    // the wrong format...
-                    throw new RuntimeException(e);
-                }
-            }
-
-            void startListening() throws IOException {
-                sseEventSource.connect();
-                final SseEventReader sseEventReader = sseEventSource.getEventReader();
-
-                future = executor.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        startHandlingEvents(sseEventReader);
-                    }
-                });
-            }
-
-            void stopListening() {
-                future.cancel(false);
-            }
 
 
-            private void startHandlingEvents(SseEventReader sseEventReader) {
-                SseEventType type;
-                try {
-                    type = sseEventReader.next();
-                    while (type != SseEventType.EOS) {
-
-                        if (type != null && type.equals(SseEventType.DATA)) {
-                            CharSequence data = sseEventReader.getData();
-                            String asStr = data.toString();
-
-                            ParticleEvent event = gson.fromJson(asStr, ParticleEvent.class);
-
-                            handler.onEvent(sseEventReader.getName(), event);
-
-                        } else {
-                            Log.e("Event Delegate: ", "type null or not data: " + type);
-                        }
-                        type = sseEventReader.next();
-                    }
-                } catch (IOException e) {
-                    handler.onEventError(e);
-                }
-            }
-        }
 
         EventApiUris(Uri baseUri) {
             allEventsUri = baseUri.buildUpon().path("/v1/" + EVENTS).build();
@@ -277,7 +214,7 @@ public class EventDelegate {
 
         Uri buildMyDevicesEventUri(@Nullable String eventNamePrefix, String accessToken) {
             if (truthy(eventNamePrefix)) {
-                return myDevicesEventsUri.buildUpon().appendPath(eventNamePrefix).build();
+                return myDevicesEventsUri.buildUpon().appendPath(eventNamePrefix + AUTH_KEY + accessToken).build();
             } else {
                 return myDevicesEventsUri;
             }
