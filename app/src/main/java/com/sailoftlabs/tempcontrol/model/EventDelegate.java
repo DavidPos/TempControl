@@ -11,7 +11,6 @@ import org.kaazing.net.sse.SseEventReader;
 import org.kaazing.net.sse.SseEventSource;
 import org.kaazing.net.sse.SseEventSourceFactory;
 import org.kaazing.net.sse.SseEventType;
-import org.kaazing.net.sse.impl.AuthenticatedEventSourceFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,7 +20,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 import io.particle.android.sdk.cloud.ApiDefs;
-import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
 import io.particle.android.sdk.cloud.ParticleEvent;
 import io.particle.android.sdk.cloud.ParticleEventHandler;
@@ -52,7 +50,7 @@ public class EventDelegate {
         this.cloudApi = cloudApi;
         this.gson = gson;
         this.executor = executor;
-        this.eventSourceFactory = new AuthenticatedEventSourceFactory(cloud);
+        this.eventSourceFactory = new AuthenticatedEventSourceAltFactory(cloud);
         this.uris = new EventApiUris(baseApiUri);
     }
 
