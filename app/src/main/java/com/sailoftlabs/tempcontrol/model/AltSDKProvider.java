@@ -20,22 +20,22 @@ public class AltSDKProvider {
         private final Context ctx;
         private final ApiDefs.CloudApi cloudApi;
         private final ApiDefs.IdentityApi identityApi;
-        private final ParticleCloud particleCloud;
+        private final ParticleAltCloud particleCloud;
         private final TokenGetterDelegateImpl tokenGetter;
 
         AltSDKProvider(Context context,
-                    @Nullable ApiFactory.OauthBasicAuthCredentialsProvider oAuthCredentialsProvider) {
+                    @Nullable AltApiFactory.OauthBasicAuthCredentialsProvider oAuthCredentialsProvider) {
 
             this.ctx = context.getApplicationContext();
 
             if (oAuthCredentialsProvider == null) {
-                oAuthCredentialsProvider = new ApiFactory.ResourceValueBasicAuthCredentialsProvider(
+                oAuthCredentialsProvider = new AltApiFactory.ResourceValueBasicAuthCredentialsProvider(
                         ctx, io.particle.android.sdk.cloud.R.string.oauth_client_id, io.particle.android.sdk.cloud.R.string.oauth_client_secret);
             }
 
             tokenGetter = new TokenGetterDelegateImpl();
 
-            ApiFactory apiFactory = new ApiFactory(ctx, tokenGetter, oAuthCredentialsProvider);
+            AltApiFactory apiFactory = new AltApiFactory(ctx, tokenGetter, oAuthCredentialsProvider);
             cloudApi = apiFactory.buildNewCloudApi();
             identityApi = apiFactory.buildNewIdentityApi();
             particleCloud = buildCloud(apiFactory);

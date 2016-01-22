@@ -58,8 +58,8 @@ public class ParticleAltCloud {
     public synchronized static ParticleCloud get(@NonNull Context context) {
         log.w("ParticleCloud.get() is deprecated and will be removed before the 1.0 release. " +
                 "Use ParticleCloudSDK.getCloud() instead!");
-        if (!ParticleCloudSDK.isInitialized()) {
-            ParticleCloudSDK.init(context);
+        if (!ParticleCloudAltSDK.isInitialized()) {
+            ParticleCloudAltSDK.init(context);
         }
         return ParticleCloudSDK.getCloud();
     }
