@@ -18,13 +18,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.sailoftlabs.tempcontrol.model.EventDelegate;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 import io.particle.android.sdk.accountsetup.LoginActivity;
 import io.particle.android.sdk.cloud.ParticleCloud;
@@ -262,7 +259,7 @@ public class MainActivity extends AppCompatActivity
             public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
 
 
-                            EventDelegate delegate = new EventDelegate();
+
 
                 subscriptionId = myDevice.subscribeToEvents("temperature",//event name
                         new ParticleEventHandler() {
