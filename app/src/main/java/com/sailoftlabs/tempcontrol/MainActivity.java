@@ -197,7 +197,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onSuccess(Void aVoid) {
                 Toaster.l(MainActivity.this, "Success");
-                subscribeEvents();
+                try {
+                    subscribeEvents();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -253,8 +257,19 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void subscribeEvents(){
-        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
+    private void subscribeEvents() throws IOException {
+        pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
+            @Override
+            public void onEvent(String eventName, ParticleEvent particleEvent) {
+                Log.i("temperature", "onEvent: " + eventName + particleEvent);
+            }
+
+            @Override
+            public void onEventError(Exception e) {
+                Log.e("temperature", "OH NOES, onEventError: ", e);
+            }
+        });
+       /* Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
             @Override
             public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
 
@@ -285,7 +300,7 @@ public class MainActivity extends AppCompatActivity
             public void onFailure(ParticleCloudException exception) {
 
             }
-        });
+        });*/
     }
 
 
