@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         tempOut = (TextView) findViewById(R.id.tempText);
         setSupportActionBar(toolbar);
-        //ParticleDeviceSetupLibrary.init(this.getApplicationContext(), MainActivity.class);
+
         ParticleCloudSDK.init(MainActivity.this);
         
 
@@ -71,8 +71,11 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        pCloud = ParticleCloudSDK.getCloud();
         SensitiveDataStorage sensitiveDataStorage = new SensitiveDataStorage(this);
         Date tokenDate = sensitiveDataStorage.getTokenExpirationDate();
         Date currentDate = new Date();
@@ -88,68 +91,17 @@ public class MainActivity extends AppCompatActivity
         Intent intent = getIntent();
         if (intent.getStringExtra("device") == null){
             getDevice();
+
         }else{
             device = intent.getStringExtra("device");
 
         }
 
-        pCloud = ParticleCloudSDK.getCloud();
 
 
 
-        /*Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
-            @Override
-            public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
-                long subscriptionId = particleCloud.subscribeToDeviceEvents("temperature",//event name
-                        myDevice.getID(), //device
-                        new ParticleEventHandler() {
-                            public void onEvent(String eventName, ParticleEvent event) {
-                                tempVar = event.dataPayload;
-                                tempOut.setText("Temp: " + event.dataPayload + " \u2103");
-                                Log.i("Photon Event: ", "Received event with payload: " + event.dataPayload);
-                            }
-
-                            public void onEventError(Exception e) {
-                                Log.e("some tag", "Event error: ", e);
-                            }
-                        });
-*/
-
-               /* try {
 
 
-                    myDevice.subscribeToEvents(
-                            "temperature",  //event name
-                            new ParticleEventHandler() {
-                                public void onEvent(String eventName, ParticleEvent event) {
-                                    tempVar = event.dataPayload;
-                                    tempOut.setText("Temp: " + event.dataPayload + " \u2103");
-                                    Log.i("Photon Event: ", "Received event with payload: " + event.dataPayload);
-                                }
-
-                                public void onEventError(Exception e) {
-                                    Log.e("some tag", "Event error: ", e);
-                                }
-                            });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return tempVar;
-            }*/
-/*
-                return null;
-            }
-            @Override
-            public void onSuccess(Void aVoid) {
-               //tempOut.setText("Temp: " + o + " \u2103");
-
-            }
-
-            @Override
-            public void onFailure(ParticleCloudException exception) {
-
-            }*/
-      //  });
 
 
 
@@ -168,10 +120,10 @@ public class MainActivity extends AppCompatActivity
 
     private void getDevice(){
 
-        final ParticleCloud cloud = ParticleCloudSDK.getCloud();
+        //final ParticleCloud cloud = ParticleCloudSDK.getCloud();
 
 
-        Async.executeAsync(cloud, new Async.ApiWork<ParticleCloud, Void>() {
+        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
 
 
             @Override
@@ -191,17 +143,25 @@ public class MainActivity extends AppCompatActivity
                 else {
                     Toaster.l(MainActivity.this,"No Devices");
                 }
+                pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
+                    @Override
+                    public void onEvent(String eventName, ParticleEvent particleEvent) {
+                        tempOut.setText(particleEvent.dataPayload);
+                        Log.i("temperature", "onEvent: " + eventName + particleEvent);
+                    }
+
+                    @Override
+                    public void onEventError(Exception e) {
+                        Log.e("temperature", "OH NOES, onEventError: ", e);
+                    }
+                });
                 return null;
             }
 
             @Override
             public void onSuccess(Void aVoid) {
                 Toaster.l(MainActivity.this, "Success");
-                try {
-                    subscribeEvents();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+
             }
 
             @Override
@@ -221,7 +181,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void getTemp() {
-        ParticleCloud pCloud = ParticleCloudSDK.getCloud();
+
         Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Object>() {
             @Override
             public Object callApi(@NonNull ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
