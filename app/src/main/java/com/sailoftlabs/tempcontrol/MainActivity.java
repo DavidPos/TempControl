@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         ParticleCloudSDK.init(MainActivity.this);
-        
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -79,34 +79,62 @@ public class MainActivity extends AppCompatActivity
         SensitiveDataStorage sensitiveDataStorage = new SensitiveDataStorage(this);
         Date tokenDate = sensitiveDataStorage.getTokenExpirationDate();
         Date currentDate = new Date();
-        if (currentDate.after(tokenDate)){
+        if (currentDate.after(tokenDate)) {
             Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(loginIntent);
-            Toaster.l(MainActivity.this,"Token date is: " + tokenDate + " " + " Current Date: " + currentDate);
-        }else{
-            Toaster.l(MainActivity.this, "Token is not expired " + currentDate +" " + "Token Date is: " +tokenDate);
+            Toaster.l(MainActivity.this, "Token date is: " + tokenDate + " " + " Current Date: " + currentDate);
+        } else {
+            Toaster.l(MainActivity.this, "Token is not expired " + currentDate + " " + "Token Date is: " + tokenDate);
         }
 
 
         Intent intent = getIntent();
-        if (intent.getStringExtra("device") == null){
+        if (intent.getStringExtra("device") == null) {
             getDevice();
 
-        }else{
+        } else {
             device = intent.getStringExtra("device");
 
         }
 
+        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
+
+
+            @Override
+            public Void callApi(@NonNull final ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+                pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
+                    @Override
+                    public void onEvent(String eventName, ParticleEvent particleEvent) {
+                        tempOut.setText(particleEvent.dataPayload);
 
 
 
+                    }
+
+                    @Override
+                    public void onEventError(Exception e) {
+                        Log.e("temperature", "OH NOES, onEventError: ", e);
+                    }
+                });
+
+                return null;
+            }
+
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toaster.l(MainActivity.this,"Success");
+
+            }
+
+            @Override
+            public void onFailure(ParticleCloudException exception) {
+
+            }
 
 
-
-
-
-
+        });
     }
+
 
     @Override
     protected void onPause() {
@@ -147,7 +175,9 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onEvent(String eventName, ParticleEvent particleEvent) {
                         tempOut.setText(particleEvent.dataPayload);
-                        Log.i("temperature", "onEvent: " + eventName + particleEvent);
+
+
+
                     }
 
                     @Override
@@ -217,51 +247,7 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void subscribeEvents() throws IOException {
-        pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
-            @Override
-            public void onEvent(String eventName, ParticleEvent particleEvent) {
-                Log.i("temperature", "onEvent: " + eventName + particleEvent);
-            }
 
-            @Override
-            public void onEventError(Exception e) {
-                Log.e("temperature", "OH NOES, onEventError: ", e);
-            }
-        });
-       /* Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
-            @Override
-            public Void callApi(@NonNull ParticleCloud particleCloud) throws ParticleCloudException, IOException {
-
-
-
-
-                subscriptionId = myDevice.subscribeToEvents("temperature",//event name
-                        new ParticleEventHandler() {
-                            public void onEvent(String eventName, ParticleEvent event) {
-                                tempVar = event.dataPayload;
-                                tempOut.setText("Temp: " + event.dataPayload + " \u2103");
-                                Log.i("Photon Event: ", "Received event with payload: " + event.dataPayload);
-                            }
-
-                            public void onEventError(Exception e) {
-                                Log.e("some tag", "Event error: ", e);
-                            }
-                        });
-                return null;
-            }
-
-            @Override
-            public void onSuccess(Void aVoid) {
-
-            }
-
-            @Override
-            public void onFailure(ParticleCloudException exception) {
-
-            }
-        });*/
-    }
 
 
     @Override
