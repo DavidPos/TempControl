@@ -29,7 +29,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
 
-    compile 'io.particle:cloudsdk:0.3.1'
+    compile 'io.particle:cloudsdk:0.3.3'
     compile 'io.particle:devicesetup:0.3.3'
 }
 

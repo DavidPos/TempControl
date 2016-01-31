@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public Void callApi(@NonNull final ParticleCloud particleCloud) throws ParticleCloudException, IOException {
-                pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
+                subscriptionId = pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
                     @Override
                     public void onEvent(String eventName, ParticleEvent particleEvent) {
                         tempOut.setText(particleEvent.dataPayload);
@@ -139,11 +139,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        /*try {
-            myDevice.unsubscribeFromEvents(subscriptionId);
-        } catch (ParticleCloudException e) {
-            e.printStackTrace();
-        }*/
+
+            if (subscriptionId < 0) {
+                try {
+                   myDevice.unsubscribeFromEvents(subscriptionId);
+                }catch(ParticleCloudException e){
+                    e.printStackTrace();
+            }
+        }
     }
 
     private void getDevice(){

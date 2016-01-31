@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ArrayAdapter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class DeviceSelect extends AppCompatActivity {
 
                 }
                 if (!devices.isEmpty()){
-
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(DeviceSelect.this, android.R.layout.simple_list_item_1);
                     myDevice = particleCloud.getDevice(devices.get(1));
                     Toaster.l(DeviceSelect.this, "Device found" + " " + myDevice.getName());
                 }
