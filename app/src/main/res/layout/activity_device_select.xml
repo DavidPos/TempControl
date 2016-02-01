@@ -23,12 +23,14 @@
 
     <include layout="@layout/content_device_select" />
 
-    <android.support.v7.widget.RecyclerView
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/deviceList">
 
-    </android.support.v7.widget.RecyclerView>
+    </ListView>
+
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
