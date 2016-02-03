@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity
     private  long subscriptionId;
     private ArrayList<String> devices = new ArrayList<>();
     ParticleCloud pCloud;
+    private CoordinatorLayout coordinatorLayout;
 
 
     @Override
@@ -52,6 +55,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         ParticleCloudSDK.init(MainActivity.this);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -74,9 +78,9 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        
         pCloud = ParticleCloudSDK.getCloud();
         SensitiveDataStorage sensitiveDataStorage = new SensitiveDataStorage(this);
         Date tokenDate = sensitiveDataStorage.getTokenExpirationDate();
@@ -106,7 +110,25 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public Void callApi(@NonNull final ParticleCloud particleCloud) throws ParticleCloudException, IOException {
-                subscriptionId = pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
+                if (myDevice == null) {
+
+                    Snackbar.make(navigationView,"No Device" ,Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+
+                } else {
+                    subscriptionId = myDevice.subscribeToEvents("temperature", new ParticleEventHandler() {
+                        @Override
+                        public void onEvent(String eventName, ParticleEvent particleEvent) {
+                            tempOut.setText(particleEvent.dataPayload + " \u2103");
+                        }
+
+                        @Override
+                        public void onEventError(Exception e) {
+                            Log.e("temperature", "OH NOES, onEventError: ", e);
+                        }
+                    });
+
+
+                       /* pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
                     @Override
                     public void onEvent(String eventName, ParticleEvent particleEvent) {
                         tempOut.setText(particleEvent.dataPayload);
@@ -119,10 +141,14 @@ public class MainActivity extends AppCompatActivity
                     public void onEventError(Exception e) {
                         Log.e("temperature", "OH NOES, onEventError: ", e);
                     }
-                });
+                });*/
 
+
+                }
                 return null;
             }
+
+
 
             @Override
             public void onSuccess(Void aVoid) {
@@ -166,20 +192,7 @@ public class MainActivity extends AppCompatActivity
 
                     myDevice = particleCloud.getDevice(deviceName);
 
-                /*pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
-                    @Override
-                    public void onEvent(String eventName, ParticleEvent particleEvent) {
-                        tempOut.setText(particleEvent.dataPayload);
 
-
-
-                    }
-
-                    @Override
-                    public void onEventError(Exception e) {
-                        Log.e("temperature", "OH NOES, onEventError: ", e);
-                    }
-                });*/
                 return null;
             }
 
@@ -211,7 +224,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public Object callApi(@NonNull ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
 
-                ParticleDevice myDevice = ParticleCloud.getDevice(device);
+
                 Object variable;
                 try {
                     variable = myDevice.getVariable("temperature");
