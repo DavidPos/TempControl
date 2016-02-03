@@ -1,6 +1,7 @@
 package com.sailoftlabs.tempcontrol;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -59,19 +61,7 @@ public class DeviceSelect extends AppCompatActivity {
 
                 final List<ParticleDevice> allDevices = particleCloud.getDevices();
                 for (ParticleDevice device : allDevices){
-                    devices.add(device.getID());
-                    adapter.add(device.getName());
-
-                }
-                if (!devices.isEmpty()){
-
-                    adapter.notifyDataSetChanged();
-
-                    //myDevice = particleCloud.getDevice(devices.get(1));
-                    Toaster.l(DeviceSelect.this, "Device found" + " " + myDevice.getName());
-                }
-                else {
-                    Toaster.l(DeviceSelect.this,"No Devices");
+                    devices.add(device.getName());
                 }
 
                 return null;
@@ -79,7 +69,9 @@ public class DeviceSelect extends AppCompatActivity {
 
             @Override
             public void onSuccess(Void aVoid) {
+                adapter.addAll(devices);
                 Toaster.l(DeviceSelect.this, "Success");
+                adapter.notifyDataSetChanged();
 
             }
 
@@ -93,6 +85,15 @@ public class DeviceSelect extends AppCompatActivity {
                 AlertDialog dialog = builder.create();
                 dialog.show();
 
+            }
+        });
+
+        deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(DeviceSelect.this, MainActivity.class);
+                intent.putExtra("device", devices.get(position));
+                startActivity(intent);
             }
         });
 

@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import io.particle.android.sdk.cloud.ParticleCloud;
 import io.particle.android.sdk.cloud.ParticleCloudException;
@@ -86,24 +85,7 @@ public class Login extends AppCompatActivity {
                             particleCloud.logIn(username, password);
                             //TODO: Add list of devices to select from once logged in
 
-                            particleCloud.getDevices();
 
-
-
-
-                            final List<ParticleDevice> allDevices = particleCloud.getDevices();
-                            for (ParticleDevice device : allDevices){
-                                devices.add(device.getID());
-
-                            }
-                            if (!devices.isEmpty()){
-
-                                mDevice = particleCloud.getDevice(devices.get(1));
-                                Toaster.l(Login.this, "Device found" + " " + mDevice.getName());
-                            }
-                            else {
-                                Toaster.l(Login.this,"No Devices");
-                            }
                             return null;
                         }
 
@@ -115,7 +97,7 @@ public class Login extends AppCompatActivity {
 
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            intent.putExtra("device", mDevice.getID());
+                            //intent.putExtra("device", mDevice.getID());
                             startActivity(intent);
                         }
 

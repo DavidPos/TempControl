@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,7 +20,6 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import io.particle.android.sdk.accountsetup.LoginActivity;
 import io.particle.android.sdk.cloud.ParticleCloud;
@@ -44,6 +42,7 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<String> devices = new ArrayList<>();
     ParticleCloud pCloud;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,14 +53,17 @@ public class MainActivity extends AppCompatActivity
 
         ParticleCloudSDK.init(MainActivity.this);
 
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Temp refreshed", Snackbar.LENGTH_LONG)
+                Intent intent = new Intent(MainActivity.this, DeviceSelect.class);
+
+
+                startActivity(intent);
+               /* Snackbar.make(view, "Temp refreshed", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                getTemp();
+                getTemp();*/
             }
         });
 
@@ -90,10 +92,12 @@ public class MainActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         if (intent.getStringExtra("device") == null) {
-            getDevice();
+            Intent intent1 = new Intent(MainActivity.this, DeviceSelect.class);
+            startActivity(intent1);
+
 
         } else {
-            device = intent.getStringExtra("device");
+            getDevice(intent.getStringExtra("device"));
 
         }
 
@@ -149,7 +153,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void getDevice(){
+    private void getDevice(final String deviceName){
 
         //final ParticleCloud cloud = ParticleCloudSDK.getCloud();
 
@@ -159,22 +163,10 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public Void callApi(@NonNull final ParticleCloud particleCloud) throws ParticleCloudException, IOException {
-                //TODO: Add list of devices to select from once logged in
 
-                final List<ParticleDevice> allDevices = particleCloud.getDevices();
-                for (ParticleDevice device : allDevices){
-                    devices.add(device.getID());
+                    myDevice = particleCloud.getDevice(deviceName);
 
-                }
-                if (!devices.isEmpty()){
-
-                    myDevice = particleCloud.getDevice(devices.get(1));
-                    Toaster.l(MainActivity.this, "Device found" + " " + myDevice.getName());
-                }
-                else {
-                    Toaster.l(MainActivity.this,"No Devices");
-                }
-                pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
+                /*pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
                     @Override
                     public void onEvent(String eventName, ParticleEvent particleEvent) {
                         tempOut.setText(particleEvent.dataPayload);
@@ -187,7 +179,7 @@ public class MainActivity extends AppCompatActivity
                     public void onEventError(Exception e) {
                         Log.e("temperature", "OH NOES, onEventError: ", e);
                     }
-                });
+                });*/
                 return null;
             }
 
