@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -40,6 +39,7 @@ public class MainActivity extends AppCompatActivity
     private TextView tempOut;
     private String device;
     private Object tempVar;
+    private String temp;
     private  long subscriptionId;
     private ArrayList<String> devices = new ArrayList<>();
     ParticleCloud pCloud;
@@ -61,13 +61,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, DeviceSelect.class);
+               getTemp();
 
-
-                startActivity(intent);
-               /* Snackbar.make(view, "Temp refreshed", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                getTemp();*/
             }
         });
 
@@ -80,7 +75,7 @@ public class MainActivity extends AppCompatActivity
 
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        
+
         pCloud = ParticleCloudSDK.getCloud();
         SensitiveDataStorage sensitiveDataStorage = new SensitiveDataStorage(this);
         Date tokenDate = sensitiveDataStorage.getTokenExpirationDate();
@@ -105,64 +100,8 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
 
 
-            @Override
-            public Void callApi(@NonNull final ParticleCloud particleCloud) throws ParticleCloudException, IOException {
-                if (myDevice == null) {
-
-                    Snackbar.make(navigationView,"No Device" ,Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-
-                } else {
-                    subscriptionId = myDevice.subscribeToEvents("temperature", new ParticleEventHandler() {
-                        @Override
-                        public void onEvent(String eventName, ParticleEvent particleEvent) {
-                            tempOut.setText(particleEvent.dataPayload + " \u2103");
-                        }
-
-                        @Override
-                        public void onEventError(Exception e) {
-                            Log.e("temperature", "OH NOES, onEventError: ", e);
-                        }
-                    });
-
-
-                       /* pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
-                    @Override
-                    public void onEvent(String eventName, ParticleEvent particleEvent) {
-                        tempOut.setText(particleEvent.dataPayload);
-
-
-
-                    }
-
-                    @Override
-                    public void onEventError(Exception e) {
-                        Log.e("temperature", "OH NOES, onEventError: ", e);
-                    }
-                });*/
-
-
-                }
-                return null;
-            }
-
-
-
-            @Override
-            public void onSuccess(Void aVoid) {
-                Toaster.l(MainActivity.this,"Success");
-
-            }
-
-            @Override
-            public void onFailure(ParticleCloudException exception) {
-
-            }
-
-
-        });
     }
 
 
@@ -198,7 +137,10 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onSuccess(Void aVoid) {
-                Toaster.l(MainActivity.this, "Success");
+                Toaster.l(MainActivity.this, "Success: " + myDevice.getName());
+                //subscribeToTemp();
+                getTemp();
+
 
             }
 
@@ -217,9 +159,7 @@ public class MainActivity extends AppCompatActivity
 
 
     }
-
-    private void getTemp() {
-
+    private void getTemp(){
         Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Object>() {
             @Override
             public Object callApi(@NonNull ParticleCloud ParticleCloud) throws ParticleCloudException, IOException {
@@ -253,6 +193,72 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             }
         });
+    }
+
+    private void subscribeToTemp() {
+
+        Async.executeAsync(pCloud, new Async.ApiWork<ParticleCloud, Void>() {
+
+
+            @Override
+            public Void callApi(@NonNull final ParticleCloud particleCloud) throws ParticleCloudException, IOException {
+
+                    subscriptionId = particleCloud.subscribeToAllEvents("temperature",new ParticleEventHandler() {
+                        @Override
+                        public void onEvent(String eventName, ParticleEvent particleEvent) {
+                            Log.e("Event: ", "onEvent: " + particleEvent.dataPayload );
+                            temp = particleEvent.dataPayload;
+
+                            tempOut.setText(temp);
+
+
+                        }
+
+                        @Override
+                        public void onEventError(Exception e) {
+                            Log.e("temperature", "OH NOES, onEventError: ", e);
+                        }
+                    });
+
+
+                       /* pCloud.subscribeToMyDevicesEvents(null, new ParticleEventHandler() {
+                    @Override
+                    public void onEvent(String eventName, ParticleEvent particleEvent) {
+                        tempOut.setText(particleEvent.dataPayload);
+
+
+
+                    }
+
+                    @Override
+                    public void onEventError(Exception e) {
+                        Log.e("temperature", "OH NOES, onEventError: ", e);
+                    }
+                });*/
+
+
+
+                return null;
+            }
+
+
+
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toaster.l(MainActivity.this,"Success event subscribed too" );
+
+
+            }
+
+            @Override
+            public void onFailure(ParticleCloudException exception) {
+
+            }
+
+
+        });
+
+
     }
 
 
