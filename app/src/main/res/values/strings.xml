@@ -46,5 +46,6 @@
     <string name="content_des_message_icon">message icon</string>
     <string name="content_desc_user_avatar">User avatar</string>
     <string name="title_activity_device_select">DeviceSelect</string>
+    <string name="title_activity_temp_set">TempSetActivity</string>
 
 </resources>
