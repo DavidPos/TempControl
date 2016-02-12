@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/tempText"
             android:textSize="20sp"
-            android:text="90"
+
             android:layout_marginLeft="50dp"
              />
 

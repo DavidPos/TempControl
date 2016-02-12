@@ -29,6 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+
+        app:backgroundTint="@color/FAB_temp"
         android:src="@mipmap/ic_shared_check"
         />
 

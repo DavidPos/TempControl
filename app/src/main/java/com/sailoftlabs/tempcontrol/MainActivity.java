@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent setTempIntent = new Intent(MainActivity.this, TempSetActivity.class);
+                startActivity(setTempIntent);
                getTemp();
 
             }
