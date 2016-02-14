@@ -11,6 +11,8 @@ import android.widget.EditText;
 
 public class TempSetActivity extends AppCompatActivity {
     EditText tempText;
+    String tempSet;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,6 +23,11 @@ public class TempSetActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         tempText = (EditText)findViewById(R.id.tempText);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        tempSet = tempText.getText().toString();
+        if(tempSet.length() < 0){
+
+
+        }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
